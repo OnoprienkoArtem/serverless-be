@@ -1,8 +1,9 @@
 import data from '../data.json';
+import { ErrorResponse } from "../utils/error-handler";
 
 export const getProducts = async () => {
-    if (data) {
-        throw new Error('Products not found!');
+    if (!data) {
+        throw new ErrorResponse('Products not found!', '404');
     }
 
     try {
@@ -14,14 +15,12 @@ export const getProducts = async () => {
             },
             body: JSON.stringify(data),
         };
-    } catch (error) {
-        return {
-            statusCode: 404,
-            body: JSON.stringify(
-                {
-                    message: error.errorMessage,
-                },
-            ),
+    } catch (_err) {
+        let err = _err;
+        if (!(err instanceof ErrorResponse)) {
+            console.error(err);
+            err = new ErrorResponse();
         }
+        return err;
     }
 };
