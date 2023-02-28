@@ -13,11 +13,51 @@ provider:
 plugins:
   - serverless-webpack
   - serverless-offline
+  - serverless-openapi-documentation
 
 custom:
   webpack:
     webpackConfig: ./webpack.config.js
     includeModules: true
+
+  documentation:
+    version: '1'
+    title: 'My API'
+    description: 'This is my API'
+    models:
+      - name: "Products"
+        description: "List of Products"
+        contentType: "application/json"
+        schema:
+          $schema: "http://json-schema.org/draft-04/schema#"
+          properties:
+            SomeObject:
+              type: "array"
+              properties:
+                count:
+                  type: "number"
+                description:
+                  type: "string"
+                id:
+                  type: "string"
+                price:
+                  type: "number"
+                title:
+                  type: "string"
+      - name: "ErrorResponse"
+        description: "This is an error"
+        contentType: "application/json"
+        schema:
+          $schema: "http://json-schema.org/draft-04/schema#"
+          properties:
+            SomeObject:
+              type: "object"
+              properties:
+                message:
+                  type: "string"
+                statusCode:
+                  type: "string"
+
 
 functions:
   getProducts:
@@ -27,6 +67,25 @@ functions:
           path: /products
           method: get
           cors: true
+          documentation:
+            summary: "Get products"
+            description: "Get list of products"
+            methodResponses:
+              - statusCode: 201
+                responseBody:
+                  description: "Array of products"
+                responseModels:
+                  application/json: "Products"
+              - statusCode: 404
+                responseBody:
+                  description: "An error message when Products not found"
+                responseModels:
+                  application/json: "ErrorResponse"
+              - statusCode: 500
+                responseBody:
+                  description: "An error message when getting Products"
+                responseModels:
+                  application/json: "ErrorResponse"
   getProductById:
     handler: product-by-id/product-by-id.getProductById
     events:
@@ -34,4 +93,28 @@ functions:
           path: /product/{id}
           method: GET
           cors: true
-
+          documentation:
+            summary: "Get product"
+            description: "Get product by it"
+            pathParams:
+              - name: id
+                description: Id of product
+                schema:
+                  type: string
+                  pattern: "^[-a-z0-9_]+$"
+            methodResponses:
+              - statusCode: 201
+                responseBody:
+                  description: "Product"
+                responseModels:
+                  application/json: "Product"
+              - statusCode: 404
+                responseBody:
+                  description: "An error message when Product not found"
+                responseModels:
+                  application/json: "ErrorResponse"
+              - statusCode: 500
+                responseBody:
+                  description: "An error message when getting Product"
+                responseModels:
+                  application/json: "ErrorResponse"

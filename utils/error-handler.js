@@ -1,7 +1,7 @@
 export class ErrorResponse {
     constructor(
         message = 'An error occurred',
-        statusCode = 500,
+        statusCode = '500',
     ) {
         const body = JSON.stringify({ message });
         this.statusCode = statusCode;
