@@ -14,6 +14,7 @@ plugins:
   - serverless-webpack
   - serverless-offline
   - serverless-openapi-documentation
+  - serverless-jest-plugin
 
 custom:
   webpack:
