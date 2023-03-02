@@ -1,14 +1,15 @@
 {
   "name": "serverless-be",
   "version": "1.0.0",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/OnoprienkoArtem/serverless-be.git"
   },
   "homepage": "https://github.com/OnoprienkoArtem/serverless-be#readme",
+  "scripts": {
+    "test": "jest",
+    "deploy": "npm run build && sls deploy"
+  },
   "devDependencies": {
     "@babel/core": "^7.21.0",
     "@babel/preset-env": "^7.20.2",
