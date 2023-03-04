@@ -93,21 +93,25 @@ module.exports = JSON.parse('[{"count":4,"description":"Short Product Descriptio
 var __webpack_exports__ = {};
 // This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
 (() => {
-/*!******************************!*\
-  !*** ./products/products.js ***!
-  \******************************/
+/*!****************************************!*\
+  !*** ./product-by-id/product-by-id.js ***!
+  \****************************************/
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "getProducts": () => (/* binding */ getProducts)
+/* harmony export */   "getProductById": () => (/* binding */ getProductById)
 /* harmony export */ });
 /* harmony import */ var source_map_support_register__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! source-map-support/register */ "source-map-support/register");
 /* harmony import */ var source_map_support_register__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(source_map_support_register__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _data_json__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../data.json */ "./data.json");
 
 
-const getProducts = async () => {
-  if (_data_json__WEBPACK_IMPORTED_MODULE_1__) {
-    throw new Error('Products not found!');
+const getProductById = async event => {
+  const {
+    id
+  } = event === null || event === void 0 ? void 0 : event.pathParameters;
+  const productById = _data_json__WEBPACK_IMPORTED_MODULE_1__.find(product => product.id === id);
+  if (!productById || !id) {
+    throw new Error('Product not found!');
   }
   try {
     return {
@@ -116,14 +120,13 @@ const getProducts = async () => {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Credentials': true
       },
-      body: JSON.stringify(_data_json__WEBPACK_IMPORTED_MODULE_1__)
+      body: JSON.stringify(productById)
     };
   } catch (error) {
-    console.log(error);
     return {
       statusCode: 404,
       body: JSON.stringify({
-        error: error.errorMessage
+        message: error.errorMessage
       })
     };
   }
@@ -135,4 +138,4 @@ for(var i in __webpack_exports__) __webpack_export_target__[i] = __webpack_expor
 if(__webpack_exports__.__esModule) Object.defineProperty(__webpack_export_target__, "__esModule", { value: true });
 /******/ })()
 ;
-//# sourceMappingURL=products.js.map
+//# sourceMappingURL=product-by-id.js.map
