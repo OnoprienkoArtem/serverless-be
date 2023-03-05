@@ -8,7 +8,9 @@
   "homepage": "https://github.com/OnoprienkoArtem/serverless-be#readme",
   "scripts": {
     "test": "jest",
-    "deploy": "npm run build && sls deploy"
+    "deploy": "sls deploy",
+    "load-sample:products": "aws dynamodb batch-write-item --request-items file://products.json --region=eu-west-1",
+    "load-sample:stocks": "aws dynamodb batch-write-item --request-items file://stocks.json --region=eu-west-1"
   },
   "devDependencies": {
     "@babel/core": "^7.21.0",
