@@ -1,12 +1,17 @@
 // import data from '../data.json';
 import {ErrorResponse} from "../utils/error-handler";
 import AWS from 'aws-sdk';
+import {mergeProductsAndStocks} from "../utils/utils";
 
 const dynamodb = new AWS.DynamoDB.DocumentClient();
 
 export const getProducts = async () => {
-    const products = await dynamodb.scan({TableName: process.env.PRODUCTS_TABLE_NAME}).promise();
-    const stocks = await dynamodb.scan({TableName: process.env.STOCKS_TABLE_NAME}).promise();
+    const products = await dynamodb.scan({
+        TableName: process.env.PRODUCTS_TABLE_NAME,
+    }).promise();
+    const stocks = await dynamodb.scan({
+        TableName: process.env.STOCKS_TABLE_NAME,
+    }).promise();
 
     if (!products || !stocks) {
         throw new ErrorResponse('Products not found!', '404');
@@ -32,11 +37,3 @@ export const getProducts = async () => {
     }
 };
 
-function mergeProductsAndStocks(products, stocks) {
-    return products.reduce((acc, product) => {
-        stocks
-            .filter(stock => product.id === stock.product_id)
-            .forEach(stock => acc.push({...product, ...{count: stock.count}}));
-        return acc;
-    }, [])
-}
