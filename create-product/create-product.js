@@ -4,7 +4,7 @@ import {v4 as uuid} from 'uuid';
 
 const dynamodb = new AWS.DynamoDB;
 
-export const createProduct = async (event, context, cb) => {
+export const createProduct = async event => {
     const {title, description, price, count} = JSON.parse(event.body);
     const id = uuid();
     const params = {
@@ -36,7 +36,7 @@ export const createProduct = async (event, context, cb) => {
         await dynamodb.transactWriteItems(params).promise();
         console.log(`POST, statusCode: 200, /products/${id} \n`, JSON.stringify({id, title, description, price, count}));
         return {
-            statusCode: '200',
+            statusCode: '201',
             headers: {
                 'Access-Control-Allow-Origin': '*',
                 'Access-Control-Allow-Credentials': true,
