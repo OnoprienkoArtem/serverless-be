@@ -29,6 +29,7 @@
     "aws-sdk": "^2.1328.0",
     "install": "^0.13.0",
     "npm": "^9.5.1",
-    "source-map-support": "^0.5.21"
+    "source-map-support": "^0.5.21",
+    "uuid": "^9.0.0"
   }
 }

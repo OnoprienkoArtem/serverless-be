@@ -23,7 +23,7 @@ export const getProductById = async event => {
     }
 
     try {
-        console.log('GET, statusCode: 200, /product \n', JSON.stringify(mergeProductsAndStocks(productById.Items, stockById.Items)));
+        console.log(`GET, statusCode: 200, /products/${id} \n`, JSON.stringify(mergeProductsAndStocks(productById.Items, stockById.Items)));
         return {
             statusCode: '200',
             headers: {

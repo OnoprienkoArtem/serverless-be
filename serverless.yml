@@ -85,12 +85,22 @@ resources:
             KeyType: HASH
 
 functions:
+  createProduct:
+    handler: create-product/create-product.createProduct
+    events:
+      - http:
+          path: /products
+          method: POST
+          cors: true
+          documentation:
+            summary: "Create product"
+            description: "Create one product"
   getProducts:
     handler: products/products.getProducts
     events:
       - http:
           path: /products
-          method: get
+          method: GET
           cors: true
           documentation:
             summary: "Get products"
@@ -115,7 +125,7 @@ functions:
     handler: product-by-id/product-by-id.getProductById
     events:
       - http:
-          path: /product/{id}
+          path: /products/{id}
           method: GET
           cors: true
           documentation:
