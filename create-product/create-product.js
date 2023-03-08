@@ -32,6 +32,10 @@ export const createProduct = async event => {
         ],
     };
 
+    if (!params) {
+        throw new ErrorResponse('Bad Request!', '400');
+    }
+
     try {
         await dynamodb.transactWriteItems(params).promise();
         console.log(`POST, statusCode: 200, /products/${id} \n`, JSON.stringify({id, title, description, price, count}));
