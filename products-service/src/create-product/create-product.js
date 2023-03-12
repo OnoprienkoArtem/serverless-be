@@ -1,4 +1,4 @@
-import {ErrorResponse} from "../utils/error-handler";
+import {ErrorResponse} from "../../../utils/error-handler";
 import AWS from "aws-sdk";
 import {v4 as uuid} from 'uuid';
 

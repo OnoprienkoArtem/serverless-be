@@ -86,7 +86,7 @@ resources:
 
 functions:
   createProduct:
-    handler: create-product/create-product.createProduct
+    handler: src/create-product/create-product.createProduct
     events:
       - http:
           path: /products
@@ -96,7 +96,7 @@ functions:
             summary: "Create product"
             description: "Create one product"
   getProducts:
-    handler: products/products.getProducts
+    handler: src/products/products.getProducts
     events:
       - http:
           path: /products
@@ -122,7 +122,7 @@ functions:
                 responseModels:
                   application/json: "ErrorResponse"
   getProductById:
-    handler: product-by-id/product-by-id.getProductById
+    handler: src/product-by-id/product-by-id.getProductById
     events:
       - http:
           path: /products/{id}

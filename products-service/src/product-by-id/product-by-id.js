@@ -1,6 +1,6 @@
-import { ErrorResponse } from "../utils/error-handler";
+import { ErrorResponse } from "../../../utils/error-handler";
 import AWS from "aws-sdk";
-import {mergeProductsAndStocks} from "../utils/utils";
+import {mergeProductsAndStocks} from "../../../utils/utils";
 
 const dynamodb = new AWS.DynamoDB.DocumentClient();
 
