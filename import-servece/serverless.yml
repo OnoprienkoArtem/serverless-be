@@ -1,0 +1,35 @@
+service: import-service
+
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  region: eu-west-1
+  profile: personalAccount
+  httpApi:
+    cors: true
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action: [
+            "s3:PutObject",
+            "s3:GetObject"
+          ]
+          Resource: [
+            "arn:aws:s3:::products-upload-s3bucket",
+            "arn:aws:s3:::products-upload-s3bucket/*"
+          ]
+
+functions:
+  importProductsFile:
+    handler: src/import-products-file/import-products-file.importProductsFile
+    events:
+      - httpApi:
+          path: /import
+          method: GET
+          request:
+            parameters:
+              query strings:
+                name: true
