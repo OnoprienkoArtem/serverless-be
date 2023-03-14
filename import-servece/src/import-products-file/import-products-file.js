@@ -1,6 +1,7 @@
-const AWS = require('aws-sdk');
+import AWS from 'aws-sdk';
+import {ErrorResponse} from "../../../utils/error-handler";
 
-exports.importProductsFile = async event => {
+export const importProductsFile = async event => {
     const s3 = new AWS.S3({ region: 'us-east-1' });
     const BUCKET = 'products-upload-s3bucket';
     const queryParamName = event.queryStringParameters.name;
@@ -22,11 +23,12 @@ exports.importProductsFile = async event => {
             },
             body: JSON.stringify(signedUrl),
         }
-    } catch (err) {
-        console.log(err);
-        return {
-            statusCode: '500',
-            body: JSON.stringify({ message: 'An error occurred' }),
-        };
+    } catch (_err) {
+        let err = _err;
+        if (!(err instanceof ErrorResponse)) {
+            console.error(err);
+            err = new ErrorResponse();
+        }
+        return err;
     }
 };

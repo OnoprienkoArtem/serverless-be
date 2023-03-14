@@ -1,4 +1,3 @@
-// import data from '../data.json';
 import {ErrorResponse} from "../../../utils/error-handler";
 import AWS from 'aws-sdk';
 import {mergeProductsAndStocks} from "../../../utils/utils";
