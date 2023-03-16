@@ -16,6 +16,7 @@ provider:
   runtime: nodejs12.x
   region: eu-west-1
   profile: personalAccount
+  timeout: 120
   httpApi:
     cors: true
   iam:
@@ -24,7 +25,12 @@ provider:
         - Effect: Allow
           Action: [
             "s3:PutObject",
-            "s3:GetObject"
+            "s3:GetObject",
+            "s3:ListBucket",
+            "s3:GetObjectTagging",
+            "s3:PutObjectTagging",
+            "s3:ListObject",
+            "s3:*"
           ]
           Resource: [
             "arn:aws:s3:::products-upload-s3bucket",
@@ -42,3 +48,12 @@ functions:
             parameters:
               query strings:
                 name: true
+  importFileParser:
+    handler: src/import-file-parser/import-file-parser.importFileParser
+    events:
+      - s3:
+          bucket: products-upload-s3bucket
+          event: s3:ObjectCreated:*
+          rules:
+            - prefix: uploaded/
+          existing: true

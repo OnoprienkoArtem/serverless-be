@@ -2,6 +2,7 @@ import AWS from 'aws-sdk';
 import {ErrorResponse} from "../../../utils/error-handler";
 
 export const importProductsFile = async event => {
+    console.log('importProductsFile event', event);
     const s3 = new AWS.S3({ region: 'us-east-1' });
     const BUCKET = 'products-upload-s3bucket';
     const queryParamName = event.queryStringParameters.name;
