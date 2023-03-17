@@ -1,6 +1,6 @@
 import AWS from 'aws-sdk';
 import csv from 'csv-parser';
-import {ErrorResponse} from "../../../utils/error-handler";
+import {ErrorResponse} from "../utils/error-handler";
 
 export const importFileParser = async event => {
     const s3 = new AWS.S3({region: 'us-east-1'});

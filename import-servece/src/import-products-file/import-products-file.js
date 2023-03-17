@@ -1,11 +1,15 @@
 import AWS from 'aws-sdk';
-import {ErrorResponse} from "../../../utils/error-handler";
+import {ErrorResponse} from "../utils/error-handler";
 
 export const importProductsFile = async event => {
-    console.log('importProductsFile event', event);
+    const queryParamName = event.queryStringParameters.name;
+
+    if (!queryParamName) {
+        throw new ErrorResponse('Query param not found!', '400');
+    }
+
     const s3 = new AWS.S3({ region: 'us-east-1' });
     const BUCKET = 'products-upload-s3bucket';
-    const queryParamName = event.queryStringParameters.name;
     const catalogName = `uploaded/${queryParamName}`;
     const params = {
         Bucket: BUCKET,
