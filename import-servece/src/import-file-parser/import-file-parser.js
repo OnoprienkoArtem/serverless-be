@@ -3,6 +3,7 @@ import csv from 'csv-parser';
 import {ErrorResponse} from "../utils/error-handler";
 
 export const importFileParser = async event => {
+    const sqs = new AWS.SQS();
     const s3 = new AWS.S3({region: 'us-east-1'});
     const catalogName = event.Records[0].s3.object.key;
     const BUCKET = 'products-upload-s3bucket';
@@ -22,6 +23,13 @@ export const importFileParser = async event => {
             s3Stream.pipe(csv())
                 .on('data', data => {
                     console.log('parsed data =>', data);
+
+                    sqs.sendMessage({
+                        MessageBody: data,
+                        QueueURL: 'catalogItemsQueue'
+                    }, () => {
+                        console.log('Send message: ', data);
+                    })
                 })
                 .on('error', error => {
                     console.error('error in stream =>', error);

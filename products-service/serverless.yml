@@ -1,7 +1,5 @@
 service: products-service
 
-# You can pin your service to only deploy with a specific Serverless version
-# Check out our docs for more details
 frameworkVersion: '3'
 
 provider:
@@ -9,6 +7,35 @@ provider:
   runtime: nodejs12.x
   region: eu-west-1
   profile: personalAccount
+
+  environment:
+    SQS_URL:
+      Ref: SQSQueue
+    PRODUCTS_TABLE_NAME: Products
+    STOCKS_TABLE_NAME: Stocks
+
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action: [
+            "s3:PutObject",
+            "s3:GetObject",
+            "s3:ListBucket",
+            "s3:GetObjectTagging",
+            "s3:PutObjectTagging",
+            "s3:ListObject",
+            "s3:*"
+          ]
+          Resource: [
+            "arn:aws:s3:::products-upload-s3bucket",
+            "arn:aws:s3:::products-upload-s3bucket/*"
+          ]
+        - Effect: Allow
+          Action:
+            - "sqs:*"
+          Resource:
+            Fn::GetAtt: [ SQSQueue, Arn ]
 
 plugins:
   - serverless-webpack
@@ -20,7 +47,6 @@ custom:
   webpack:
     webpackConfig: ./webpack.config.js
     includeModules: true
-
   documentation:
     version: '1'
     title: 'My API'
@@ -61,6 +87,10 @@ custom:
 
 resources:
   Resources:
+    SQSQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: catalogItemsQueue
     Stocks:
       Type: AWS::DynamoDB::Table
       Properties:
@@ -153,3 +183,12 @@ functions:
                   description: "An error message when getting Product"
                 responseModels:
                   application/json: "ErrorResponse"
+  catalogBatchProcess:
+    handler: src/catalog-batch-process/catalog-batch-process.catalogBatchProcess
+    events:
+      - sqs:
+          batchSize: 5
+          arn:
+            Fn::GetAtt:
+              - SQSQueue
+              - Arn

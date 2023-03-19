@@ -19,6 +19,9 @@ provider:
   timeout: 120
   httpApi:
     cors: true
+  environment:
+    PRODUCTS_TABLE_NAME: Products
+    STOCKS_TABLE_NAME: Stocks
   iam:
     role:
       statements:
@@ -30,12 +33,18 @@ provider:
             "s3:GetObjectTagging",
             "s3:PutObjectTagging",
             "s3:ListObject",
-            "s3:*"
+            "s3:*",
+            "sqs:*"
           ]
           Resource: [
             "arn:aws:s3:::products-upload-s3bucket",
-            "arn:aws:s3:::products-upload-s3bucket/*"
+            "arn:aws:s3:::products-upload-s3bucket/*",
+            "arn:aws:sqs:::sqs-products"
           ]
+        - Effect: Allow
+          Action:
+            - "sqs:*"
+          Resource: '*'
 
 functions:
   importProductsFile:
