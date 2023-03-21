@@ -18,22 +18,13 @@ provider:
     role:
       statements:
         - Effect: Allow
-          Action: [
-            "s3:PutObject",
-            "s3:GetObject",
-            "s3:ListBucket",
-            "s3:GetObjectTagging",
-            "s3:PutObjectTagging",
-            "s3:ListObject",
-            "s3:*"
-          ]
+          Action: "s3:*"
           Resource: [
             "arn:aws:s3:::products-upload-s3bucket",
             "arn:aws:s3:::products-upload-s3bucket/*"
           ]
         - Effect: Allow
-          Action:
-            - "sqs:*"
+          Action: "sqs:*"
           Resource:
             Fn::GetAtt: [ SQSQueue, Arn ]
 

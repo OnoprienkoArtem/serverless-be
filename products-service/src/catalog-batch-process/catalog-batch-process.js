@@ -1,6 +1,7 @@
 import { ErrorResponse } from "../utils/error-handler";
 
 export const catalogBatchProcess = async event => {
+    console.log('event', event);
     const products = event.Records.map(({body}) => body);
 
     try {
