@@ -6,6 +6,7 @@ const dynamodb = new AWS.DynamoDB;
 
 export const createProduct = async event => {
     const {title, description, price, count} = JSON.parse(event.body);
+    console.log('createProduct - JSON.parse(event.body)', JSON.parse(event.body));
     const id = uuid();
     const params = {
         TransactItems: [
