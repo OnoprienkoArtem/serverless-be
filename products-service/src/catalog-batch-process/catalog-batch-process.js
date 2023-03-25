@@ -2,26 +2,48 @@ import { ErrorResponse } from "../utils/error-handler";
 import AWS from "aws-sdk";
 
 const lambda = new AWS.Lambda({ region: 'eu-west-1' });
+const SNS = new AWS.SNS({ region: 'eu-west-1' });
 
 export const catalogBatchProcess = async event => {
-    const products = event.Records.map(({body}) => body);
-
     try {
-        await new Promise((resolve, reject) => {
-            products.map(async (product) => {
+        const products = event.Records.map(({body}) => body);
+        console.log('products', products);
+        return new Promise((resolve, reject) => {
+            products.forEach((product) => {
                 const payload = JSON.stringify({ body: product });
                 const params = {
                     FunctionName: 'products-service-dev-createProduct',
                     Payload: payload,
                 };
 
+                console.log('PRODUCT', products);
+
                 lambda.invoke(params, (error, data) => {
                     if (error) {
                         reject(error);
-                        throw new ErrorResponse(error);
+                        return;
                     }
 
-                    console.log('data lambda invoke', data);
+                    console.log('PRODUCT', data);
+
+                    SNS.publish({
+                        Subject: 'Product was added',
+                        Message: JSON.stringify({ body: data }),
+                        TopicArn: process.env.SNS_ARN,
+                        MessageAttributes: {
+                            title: {
+                                DataType: 'String',
+                                StringValue: JSON.parse(product.body)?.title,
+                            },
+                        },
+                    }, (error, result) => {
+                        if (error) {
+                            console.error('SNS error', error);
+                        }
+                        console.log('SNS result', result)
+                    });
+
+                    resolve(JSON.stringify({ body: data }));
                 });
             });
         });

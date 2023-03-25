@@ -33,7 +33,7 @@ export const importFileParser = async event => {
                         }
                         console.log('result', result);
                         console.log('Send message: ', data);
-                    })
+                    });
                 })
                 .on('error', error => {
                     console.error('error in stream =>', error);

@@ -2,6 +2,8 @@ service: products-service
 
 frameworkVersion: '3'
 
+useDotenv: true
+
 provider:
   name: aws
   runtime: nodejs12.x
@@ -11,6 +13,8 @@ provider:
   environment:
     SQS_URL:
       Ref: SQSQueue
+    SNS_ARN:
+      Ref: SNSTopic
     PRODUCTS_TABLE_NAME: Products
     STOCKS_TABLE_NAME: Stocks
 
@@ -33,6 +37,11 @@ provider:
           Action:
             - "lambda:InvokeFunction"
           Resource: "*"
+
+        - Effect: "Allow"
+          Action: "sns:*"
+          Resource:
+            Ref: SNSTopic
 
 plugins:
   - serverless-webpack
@@ -88,6 +97,25 @@ resources:
       Type: AWS::SQS::Queue
       Properties:
         QueueName: catalogItemsQueue
+
+    SNSTopic:
+      Type: AWS::SNS::Topic
+      Properties:
+        TopicName: createProductTopic
+        Subscription:
+          - Endpoint: ${env:EMAIL}
+            Protocol: email
+    SNSTopicSubscription:
+      Type: AWS::SNS::Subscription
+      Properties:
+        Endpoint: ${env:EMAIL1}
+        Protocol: email
+        FilterPolicy:
+          title:
+            - "mobile"
+        TopicArn:
+          Ref: SNSTopic
+
     Stocks:
       Type: AWS::DynamoDB::Table
       Properties:
