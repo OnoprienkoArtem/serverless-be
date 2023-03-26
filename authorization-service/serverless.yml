@@ -1,0 +1,55 @@
+service: authorization-service
+
+frameworkVersion: '3'
+
+useDotenv: true
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  region: eu-west-1
+  profile: personalAccount
+
+  environment:
+
+
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action: "s3:*"
+          Resource: [
+            "arn:aws:s3:::products-upload-s3bucket",
+            "arn:aws:s3:::products-upload-s3bucket/*"
+          ]
+
+        - Effect: Allow
+          Action: "sqs:*"
+          Resource:
+            Fn::GetAtt: [ SQSQueue, Arn ]
+
+        - Effect: "Allow"
+          Action:
+            - "lambda:InvokeFunction"
+          Resource: "*"
+
+        - Effect: "Allow"
+          Action: "sns:*"
+          Resource:
+            Ref: SNSTopic
+
+plugins:
+  - serverless-webpack
+  - serverless-jest-plugin
+
+custom:
+  webpack:
+    webpackConfig: ./webpack.config.js
+    includeModules: true
+
+
+functions:
+  basicAuthorizer:
+    handler: src/basic-authorizer/basic-authorizer.basicAuthorizer
+    events:
+

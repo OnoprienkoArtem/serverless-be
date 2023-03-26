@@ -208,12 +208,12 @@ functions:
                   description: "An error message when getting Product"
                 responseModels:
                   application/json: "ErrorResponse"
-  catalogBatchProcess:
-    handler: src/catalog-batch-process/catalog-batch-process.catalogBatchProcess
-    events:
-      - sqs:
-          batchSize: 5
-          arn:
-            Fn::GetAtt:
-              - SQSQueue
-              - Arn
+#  catalogBatchProcess:
+#    handler: src/catalog-batch-process/catalog-batch-process.catalogBatchProcess
+#    events:
+#      - sqs:
+#          batchSize: 5
+#          arn:
+#            Fn::GetAtt:
+#              - SQSQueue
+#              - Arn

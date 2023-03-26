@@ -30,20 +30,18 @@ export const catalogBatchProcess = async event => {
                         Subject: 'Product was added',
                         Message: JSON.stringify({ body: data }),
                         TopicArn: process.env.SNS_ARN,
-                        MessageAttributes: {
-                            title: {
-                                DataType: 'String',
-                                StringValue: JSON.parse(product.body)?.title,
-                            },
-                        },
+                        // MessageAttributes: {
+                        //     title: {
+                        //         DataType: 'String',
+                        //         StringValue: JSON.parse(product.body)?.title,
+                        //     },
+                        // },
                     }, (error, result) => {
                         if (error) {
                             console.error('SNS error', error);
                         }
                         console.log('SNS result', result)
                     });
-
-                    resolve(JSON.stringify({ body: data }));
                 });
             });
         });
