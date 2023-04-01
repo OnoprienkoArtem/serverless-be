@@ -17,7 +17,7 @@ provider:
   region: eu-west-1
   profile: personalAccount
   timeout: 120
-  httpApi:
+  http:
     cors: true
   environment:
     PRODUCTS_TABLE_NAME: Products
@@ -50,12 +50,14 @@ functions:
   importProductsFile:
     handler: src/import-products-file/import-products-file.importProductsFile
     events:
-      - httpApi:
+      - http:
           path: /import
+          cors: true
           method: GET
+          authorizer: arn:aws:lambda:${self:provider.region}:${aws:accountId}:function:authorization-service-dev-basicAuthorizer
           request:
             parameters:
-              query strings:
+              querystrings:
                 name: true
   importFileParser:
     handler: src/import-file-parser/import-file-parser.importFileParser
