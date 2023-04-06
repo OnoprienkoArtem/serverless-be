@@ -1,0 +1,70 @@
+service: import-service
+
+frameworkVersion: '3'
+
+plugins:
+  - serverless-webpack
+  - serverless-jest-plugin
+
+custom:
+  webpack:
+    webpackConfig: webpack.config.js
+    includeModules: true
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  region: eu-west-1
+  profile: personalAccount
+  timeout: 120
+  http:
+    cors: true
+  environment:
+    PRODUCTS_TABLE_NAME: Products
+    STOCKS_TABLE_NAME: Stocks
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action: [
+            "s3:PutObject",
+            "s3:GetObject",
+            "s3:ListBucket",
+            "s3:GetObjectTagging",
+            "s3:PutObjectTagging",
+            "s3:ListObject",
+            "s3:*",
+            "sqs:*"
+          ]
+          Resource: [
+            "arn:aws:s3:::products-upload-s3bucket",
+            "arn:aws:s3:::products-upload-s3bucket/*",
+            "arn:aws:sqs:::sqs-products"
+          ]
+        - Effect: Allow
+          Action:
+            - "sqs:*"
+          Resource: '*'
+
+functions:
+  importProductsFile:
+    handler: src/import-products-file/import-products-file.importProductsFile
+    events:
+      - http:
+          path: /import
+          cors: true
+          method: GET
+          authorizer: arn:aws:lambda:${self:provider.region}:${aws:accountId}:function:authorization-service-dev-basicAuthorizer
+          request:
+            parameters:
+              querystrings:
+                name: true
+  importFileParser:
+    handler: src/import-file-parser/import-file-parser.importFileParser
+    events:
+      - s3:
+          bucket: products-upload-s3bucket
+          event: s3:ObjectCreated:*
+          rules:
+            - prefix: uploaded/
+          existing: true

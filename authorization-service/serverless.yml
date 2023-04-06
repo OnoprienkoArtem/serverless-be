@@ -1,0 +1,35 @@
+service: authorization-service
+
+frameworkVersion: '3'
+
+useDotenv: true
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  region: eu-west-1
+  profile: personalAccount
+  http:
+    cors: true
+  environment:
+    USERNAME: ${env:USERNAME}
+    PASSWORD: ${env:PASSWORD}
+
+plugins:
+  - serverless-webpack
+  - serverless-jest-plugin
+
+custom:
+  webpack:
+    webpackConfig: ./webpack.config.js
+    includeModules: true
+
+functions:
+  basicAuthorizer:
+    handler: src/basic-authorizer/basic-authorizer.basicAuthorizer
+    events:
+      - http:
+          path: auth
+          method: get
+          cors: true
+

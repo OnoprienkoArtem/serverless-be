@@ -1,0 +1,28 @@
+{
+  "name": "import-servece",
+  "version": "1.0.0",
+  "description": "",
+  "main": "handler.js",
+  "scripts": {
+    "test": "node_modules/.bin/jest"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.288.0",
+    "aws-sdk": "^2.771.0",
+    "aws-sdk-mock": "^5.8.0",
+    "csv-parser": "^3.0.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.21.3",
+    "@babel/preset-env": "^7.20.2",
+    "babel-loader": "^9.1.2",
+    "babel-plugin-source-map-support": "^2.2.0",
+    "dotenv": "^16.0.3",
+    "serverless-jest-plugin": "^0.4.0",
+    "serverless-webpack": "^5.11.0",
+    "webpack": "^5.76.1",
+    "webpack-node-externals": "^3.0.0"
+  }
+}

@@ -1,0 +1,218 @@
+service: products-service
+
+frameworkVersion: '3'
+
+useDotenv: true
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  region: eu-west-1
+  profile: personalAccount
+
+  environment:
+    SQS_URL:
+      Ref: SQSQueue
+    SNS_ARN:
+      Ref: SNSTopic
+    PRODUCTS_TABLE_NAME: Products
+    STOCKS_TABLE_NAME: Stocks
+
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action: "s3:*"
+          Resource: [
+            "arn:aws:s3:::products-upload-s3bucket",
+            "arn:aws:s3:::products-upload-s3bucket/*"
+          ]
+
+        - Effect: Allow
+          Action: "sqs:*"
+          Resource:
+            Fn::GetAtt: [ SQSQueue, Arn ]
+
+        - Effect: "Allow"
+          Action:
+            - "lambda:InvokeFunction"
+          Resource: "*"
+
+        - Effect: "Allow"
+          Action: "sns:*"
+          Resource:
+            Ref: SNSTopic
+
+plugins:
+  - serverless-webpack
+  - serverless-offline
+  - serverless-openapi-documentation
+  - serverless-jest-plugin
+
+custom:
+  webpack:
+    webpackConfig: ./webpack.config.js
+    includeModules: true
+  documentation:
+    version: '1'
+    title: 'My API'
+    description: 'This is my API'
+    models:
+      - name: "Products"
+        description: "List of Products"
+        contentType: "application/json"
+        schema:
+          $schema: "http://json-schema.org/draft-04/schema#"
+          properties:
+            SomeObject:
+              type: "array"
+              properties:
+                count:
+                  type: "number"
+                description:
+                  type: "string"
+                id:
+                  type: "string"
+                price:
+                  type: "number"
+                title:
+                  type: "string"
+      - name: "ErrorResponse"
+        description: "This is an error"
+        contentType: "application/json"
+        schema:
+          $schema: "http://json-schema.org/draft-04/schema#"
+          properties:
+            SomeObject:
+              type: "object"
+              properties:
+                message:
+                  type: "string"
+                statusCode:
+                  type: "string"
+
+resources:
+  Resources:
+    SQSQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: catalogItemsQueue
+    SNSTopic:
+      Type: AWS::SNS::Topic
+      Properties:
+        TopicName: createProductTopic
+        Subscription:
+          - Endpoint: ${env:EMAIL}
+            Protocol: email
+    SNSTopicSubscription:
+      Type: AWS::SNS::Subscription
+      Properties:
+        Endpoint: ${env:EMAIL1}
+        Protocol: email
+        FilterPolicy:
+          title:
+            - "mobile"
+        TopicArn:
+          Ref: SNSTopic
+
+    Stocks:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: Stocks
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: product_id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: product_id
+            KeyType: HASH
+    Products:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: Products
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+
+functions:
+  createProduct:
+    handler: src/create-product/create-product.createProduct
+    events:
+      - http:
+          path: /products
+          method: POST
+          cors: true
+          documentation:
+            summary: "Create product"
+            description: "Create one product"
+  getProducts:
+    handler: src/products/products.getProducts
+    events:
+      - http:
+          path: /products
+          method: GET
+          cors: true
+          documentation:
+            summary: "Get products"
+            description: "Get list of products"
+            methodResponses:
+              - statusCode: 201
+                responseBody:
+                  description: "Array of products"
+                responseModels:
+                  application/json: "Products"
+              - statusCode: 404
+                responseBody:
+                  description: "An error message when Products not found"
+                responseModels:
+                  application/json: "ErrorResponse"
+              - statusCode: 500
+                responseBody:
+                  description: "An error message when getting Products"
+                responseModels:
+                  application/json: "ErrorResponse"
+  getProductById:
+    handler: src/product-by-id/product-by-id.getProductById
+    events:
+      - http:
+          path: /products/{id}
+          method: GET
+          cors: true
+          documentation:
+            summary: "Get product"
+            description: "Get product by it"
+            pathParams:
+              - name: id
+                description: Id of product
+                schema:
+                  type: string
+                  pattern: "^[-a-z0-9_]+$"
+            methodResponses:
+              - statusCode: 201
+                responseBody:
+                  description: "Product"
+                responseModels:
+                  application/json: "Product"
+              - statusCode: 404
+                responseBody:
+                  description: "An error message when Product not found"
+                responseModels:
+                  application/json: "ErrorResponse"
+              - statusCode: 500
+                responseBody:
+                  description: "An error message when getting Product"
+                responseModels:
+                  application/json: "ErrorResponse"
+  catalogBatchProcess:
+    handler: src/catalog-batch-process/catalog-batch-process.catalogBatchProcess
+    events:
+      - sqs:
+          batchSize: 5
+          arn:
+            Fn::GetAtt:
+              - SQSQueue
+              - Arn
