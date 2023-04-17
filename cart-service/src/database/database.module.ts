@@ -14,9 +14,10 @@ import { CartItems, Carts, Orders, Users } from './entities';
             database: process.env.DATABASE_NAME,
             entities: ['dist/database/entities/*.entity{.ts,.js}'],
             logging: true,
+            // synchronize: true,
             namingStrategy: new SnakeNamingStrategy(),
         }),
-        TypeOrmModule.forFeature([Users, Carts, CartItems, Orders]),
+        TypeOrmModule.forFeature([Carts, CartItems, Orders, Users]),
     ],
     exports: [TypeOrmModule],
 })

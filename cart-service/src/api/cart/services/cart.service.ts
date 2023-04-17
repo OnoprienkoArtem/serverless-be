@@ -3,28 +3,48 @@ import { Injectable } from '@nestjs/common';
 import { v4 } from 'uuid';
 
 import { Cart } from '../models';
+import { InjectRepository } from '@nestjs/typeorm';
+import { CartItems, Carts } from '../../../database/entities';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class CartService {
+  constructor(
+      @InjectRepository(Carts) private readonly cartRepo: Repository<Carts>,
+      @InjectRepository(CartItems) private readonly cartItemsRepo: Repository<CartItems>,
+  ) {
+  }
+
   private userCarts: Record<string, Cart> = {};
 
-  findByUserId(userId: string): Cart {
-    return this.userCarts[ userId ];
+  async findByUserId(userId: string): Promise<Carts> {
+    const res = await this.cartRepo.findOne({
+      where: { user_id: userId },
+      relations: ['items']
+    });
+
+    return res;
   }
 
-  createByUserId(userId: string) {
-    const id = v4(v4());
-    const userCart = {
-      id,
-      items: [],
-    };
-
-    this.userCarts[ userId ] = userCart;
-
-    return userCart;
+  async createByUserId(userId: string) {
+    try {
+      const res = await this.cartRepo.insert({
+        user_id: userId,
+        created_at: '2023-03-31',
+        updated_at: '2023-03-31',
+        status: 'OPEN'
+      });
+      const userCart = {
+        id: res.raw[0].id,
+        items: [],
+      };
+      return userCart;
+    } catch (e) {
+      console.log(e);
+    }
   }
 
-  findOrCreateByUserId(userId: string): Cart {
+  findOrCreateByUserId(userId: string): Promise<any> {
     const userCart = this.findByUserId(userId);
 
     if (userCart) {
@@ -34,8 +54,8 @@ export class CartService {
     return this.createByUserId(userId);
   }
 
-  updateByUserId(userId: string, { items }: Cart): Cart {
-    const { id, ...rest } = this.findOrCreateByUserId(userId);
+  async updateByUserId(userId: string, { items }: Cart): Promise<Cart> {
+    const { id, ...rest } = await this.findOrCreateByUserId(userId);
 
     const updatedCart = {
       id,
@@ -43,7 +63,15 @@ export class CartService {
       items: [ ...items ],
     }
 
-    this.userCarts[ userId ] = { ...updatedCart };
+    updatedCart.items.forEach(item => {
+      item.product = {
+        price: 100
+      }
+    });
+
+    const votesEntities = this.cartItemsRepo.create(updatedCart.items);
+
+    await this.cartItemsRepo.save(votesEntities)
 
     return { ...updatedCart };
   }

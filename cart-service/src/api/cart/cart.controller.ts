@@ -6,6 +6,7 @@ import { AppRequest, getUserIdFromRequest } from '../../shared';
 
 import { calculateCartTotal } from './models-rules';
 import { CartService } from './services';
+import { Cart } from './models';
 
 @Controller('api/profile/cart')
 export class CartController {
@@ -17,8 +18,13 @@ export class CartController {
   // @UseGuards(JwtAuthGuard)
   // @UseGuards(BasicAuthGuard)
   @Get()
-  findUserCart(@Req() req: AppRequest) {
-    const cart = this.cartService.findOrCreateByUserId(getUserIdFromRequest(req));
+  async findUserCart(@Req() req: AppRequest) {
+    const cart = await this.cartService.findOrCreateByUserId(getUserIdFromRequest(req));
+    cart.items.forEach(item => {
+      item.product = {
+        price: 100
+      }
+    });
 
     return {
       statusCode: HttpStatus.OK,
@@ -30,8 +36,8 @@ export class CartController {
   // @UseGuards(JwtAuthGuard)
   // @UseGuards(BasicAuthGuard)
   @Put()
-  updateUserCart(@Req() req: AppRequest, @Body() body) { // TODO: validate body payload...
-    const cart = this.cartService.updateByUserId(getUserIdFromRequest(req), body)
+  async updateUserCart(@Req() req: AppRequest, @Body() body) { // TODO: validate body payload...
+    const cart = await this.cartService.updateByUserId(getUserIdFromRequest(req), body);
 
     return {
       statusCode: HttpStatus.OK,
@@ -58,9 +64,9 @@ export class CartController {
   // @UseGuards(JwtAuthGuard)
   // @UseGuards(BasicAuthGuard)
   @Post('checkout')
-  checkout(@Req() req: AppRequest, @Body() body) {
+  async checkout(@Req() req: AppRequest, @Body() body) {
     const userId = getUserIdFromRequest(req);
-    const cart = this.cartService.findByUserId(userId);
+    const cart = await this.cartService.findByUserId(userId);
 
     if (!(cart && cart.items.length)) {
       const statusCode = HttpStatus.BAD_REQUEST;
@@ -73,8 +79,14 @@ export class CartController {
     }
 
     const { id: cartId, items } = cart;
-    const total = calculateCartTotal(cart);
-    const order = this.orderService.create({
+    cart.items.forEach(item => {
+      item['product'] = {
+        price: 100
+      }
+      return item;
+    });
+    const total = calculateCartTotal(cart as unknown as Cart);
+    const order = await this.orderService.create({
       ...body, // TODO: validate and pick only necessary data
       userId,
       cartId,

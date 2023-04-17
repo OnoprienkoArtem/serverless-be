@@ -1,6 +1,6 @@
 insert into orders (user_id, cart_id, payment, delivery, comments, status, total) values (
-    '56a98772-3732-4aac-a270-230ab941f17e',
-    '4599de1e-5050-4b28-94c0-e408c31a6e01',
+    '7521c91b-b75e-4c09-9a0d-aaa8a78a35dc',
+    'ae7e8d56-e632-4778-ac87-384419fa73f0',
     '{ "type": "cash", "address": "address_1", "creditCard": "1111" }',
     '{ "type": "courier", "address": "address 1" }',
     'some comment 1',
@@ -9,8 +9,8 @@ insert into orders (user_id, cart_id, payment, delivery, comments, status, total
 );
 
 insert into orders (user_id, cart_id, payment, delivery, comments, status, total) values (
-    '779f7f21-1105-47a2-8211-286647b30a71',
-    '7486258c-8ddd-41b0-a3f0-58628864d8cb',
+    '851e9559-def3-4a0c-befb-d1388122deff',
+    '14acf919-737e-4329-b141-47af91691713',
     '{ "type": "cash", "address": "address_2", "creditCard": "2222" }',
     '{ "type": "courier", "address": "address 2" }',
     'some comment 2',
@@ -19,8 +19,8 @@ insert into orders (user_id, cart_id, payment, delivery, comments, status, total
 );
 
 insert into orders (user_id, cart_id, payment, delivery, comments, status, total) values (
-    '87f818ee-4994-446b-a0c2-03787c1ea827',
-    'fb011059-2275-4b33-a08d-c0f55b319488',
+    '78bdc54c-2e53-4b65-a3e6-6966fc77cd0e',
+    '3336e94c-70fe-4003-8bfa-95f1d7465ad5',
     '{ "type": "cash", "address": "address_3", "creditCard": "3333" }',
     '{ "type": "courier", "address": "address 3" }',
     'some comment 3',

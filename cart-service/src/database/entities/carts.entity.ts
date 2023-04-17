@@ -15,7 +15,7 @@ export class Carts {
 
     @OneToMany(() => Users, (user) => user.id)
     @JoinColumn({ name: 'user_id', referencedColumnName: 'id' })
-    users: Users;
+    user_id: Users;
 
     @Column({ type: 'date', nullable: false })
     created_at: string;
@@ -25,4 +25,8 @@ export class Carts {
 
     @Column({ type: 'enum', enum: ['OPEN', 'ORDERED'], nullable: false })
     status: 'OPEN' | 'ORDERED';
+
+    @OneToMany(() => CartItems, (cartItem) => cartItem.cart_id)
+    @JoinColumn({ name: 'id', referencedColumnName: 'cart_id' })
+    items: CartItems[];
 }

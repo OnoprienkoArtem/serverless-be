@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Users } from './users.entity';
 import { Carts } from './carts.entity';
 
@@ -7,13 +7,13 @@ export class Orders {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    @ManyToOne(() => Users, (user) => user.id)
+    @OneToOne(() => Users)
     @JoinColumn({ name: 'user_id', referencedColumnName: 'id' })
-    users: Users;
+    user_id: string;
 
-    @ManyToOne(() => Carts, (cart) => cart.id)
+    @OneToOne(() => Carts)
     @JoinColumn({ name: 'cart_id', referencedColumnName: 'id' })
-    carts: Carts;
+    cart_id: string;
 
     @Column({ type: 'json', nullable: false })
     payment: { type: string, address?: any, creditCard?: any, };
