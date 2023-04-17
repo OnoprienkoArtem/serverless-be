@@ -4,3 +4,7 @@ jspm_packages
 
 # Serverless directories
 .serverless
+
+cart-service/.env
+authorization-service/.env
+products-service/.env
